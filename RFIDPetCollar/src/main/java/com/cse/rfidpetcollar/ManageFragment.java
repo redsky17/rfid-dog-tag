@@ -2,6 +2,7 @@ package com.cse.rfidpetcollar;
 
 import android.app.Fragment;
 import android.content.ClipData;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,6 +46,10 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         setHasOptionsMenu(true);
 
         return rootView;
+    }
+
+    private void getListViewItems(){
+        //SharedPreferences prefs = getSharedPreferences()
     }
 
     @Override

@@ -12,12 +12,14 @@
     <string-array name="nav_drawer_items">
         <item>Manage Pets</item>
         <item>Locate My Pet</item>
+        <item>Access Times</item>
     </string-array>
 
     <!-- Navigation Drawer Icons -->
     <!-- Must be in the same order as the items! -->
     <array name="nav_drawer_icons">
         <item>@drawable/ic_action_edit</item>
+        <item>@drawable/ic_action_map</item>
         <item>@drawable/ic_action_map</item>
     </array>
 

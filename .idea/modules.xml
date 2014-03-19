@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/RFIDPetCollar/RFIDPetCollar.iml" filepath="$PROJECT_DIR$/RFIDPetCollar/RFIDPetCollar.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RFIDPetCollarProject.iml" filepath="$PROJECT_DIR$/RFIDPetCollarProject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rfid-dog-tag.iml" filepath="$PROJECT_DIR$/rfid-dog-tag.iml" />
     </modules>
   </component>
 </project>
