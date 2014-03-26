@@ -18,9 +18,9 @@
     <!-- Navigation Drawer Icons -->
     <!-- Must be in the same order as the items! -->
     <array name="nav_drawer_icons">
-        <item>@drawable/ic_action_edit</item>
-        <item>@drawable/ic_action_map</item>
-        <item>@drawable/ic_action_map</item>
+        <item>@drawable/ic_action_paw</item>
+        <item>@drawable/ic_action_globe</item>
+        <item>@drawable/ic_action_clock</item>
     </array>
 
     <!-- Content Description -->
