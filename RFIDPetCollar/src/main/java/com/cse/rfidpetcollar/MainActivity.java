@@ -29,12 +29,10 @@ import com.cse.rfidpetcollar.model.NavDrawerItem;
 import java.util.ArrayList;
 
 public class MainActivity extends android.support.v7.app.ActionBarActivity {
-
-    private String[] mNavTitles;
-    private TypedArray mNavIcons;
-
-    private ArrayList<NavDrawerItem> navDrawerItems;
-    private NavDrawerListAdapter adapter;
+    private NavDrawerListAdapter adapter;                   // adapter for menu items
+    private String[] mNavTitles;                            // each menu item
+    private TypedArray mNavIcons;                           // icon for each menu item
+    private ArrayList<NavDrawerItem> navDrawerItems;        // each menu item with icon
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -52,7 +50,6 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         mTitle = getString(R.string.app_name);
 
         navDrawerItems = new ArrayList<NavDrawerItem>();
-
         for (int i = 0; i < mNavTitles.length; i++){
             navDrawerItems.add(new NavDrawerItem(mNavTitles[i], mNavIcons.getResourceId(i, -1)));
         }
@@ -161,6 +158,9 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 break;
             case 1:
                 fragment = new LocateFragment();
+                break;
+            case 2:
+                fragment = new AccessFragment();
                 break;
 // TODO: Add more fragments as needed.
 

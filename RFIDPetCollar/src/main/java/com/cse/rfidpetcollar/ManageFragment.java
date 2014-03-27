@@ -33,12 +33,10 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         ListView mListView = (ListView) rootView.findViewById(R.id.list_manage);
 
         List<RfidViewItem> items = new ArrayList<RfidViewItem>();
-        items.add(new RfidViewListHeader(inflater, "DOGGY DOOR"));
+        items.add(new RfidViewListHeader(inflater, "PET DOOR PERMISSIONS"));
         items.add(new RfidViewListItem(inflater,"Sparky"));
         items.add(new RfidViewListItem(inflater,"Mr. Whiskers"));
-        items.add(new RfidViewListHeader(inflater, "LITTER BOX"));
-        items.add(new RfidViewListItem(inflater, "Sparky"));
-        items.add(new RfidViewListItem(inflater, "Mr. Whiskers"));
+
 
         RfidViewListAdapter adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);
