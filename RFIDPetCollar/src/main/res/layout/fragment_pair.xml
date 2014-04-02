@@ -25,4 +25,13 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:hint="Tag Id " />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Tag"
+        android:id="@+id/add_tag"
+        android:layout_below="@+id/tag_id"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
