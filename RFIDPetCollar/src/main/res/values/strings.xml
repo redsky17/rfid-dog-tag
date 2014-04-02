@@ -11,8 +11,8 @@
     <!-- Navigation Drawer Entries -->
     <string-array name="nav_drawer_items">
         <item>Manage Pets</item>
-        <item>Locate My Pet</item>
         <item>Access Times</item>
+        <item>Locate Pets</item>
     </string-array>
 
     <!-- Navigation Drawer Icons -->

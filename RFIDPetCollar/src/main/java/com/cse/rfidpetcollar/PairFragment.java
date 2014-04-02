@@ -10,12 +10,21 @@ import android.view.ViewGroup;
  */
 public class PairFragment extends android.support.v4.app.Fragment {
     public PairFragment(){}
+    private String title = "Pair Tags";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pair, container, false);
+        ((MainActivity) getActivity()).setTitle(title);
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Set title
+        ((MainActivity) getActivity()).setTitle(title);
     }
 }

@@ -1,5 +1,6 @@
 package com.cse.rfidpetcollar;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,16 +21,17 @@ import java.util.List;
  * Created by Joseph on 2/5/14.
  */
 public class ManageFragment extends android.support.v4.app.Fragment {
-
     public ManageFragment(){}
+    private String title = "Manage Pets";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_manage, container, false);
-
         ListView mListView = (ListView) rootView.findViewById(R.id.list_manage);
+
+        ((MainActivity) getActivity()).setTitle(title);
 
         List<RfidViewItem> items = new ArrayList<RfidViewItem>();
         items.add(new RfidViewListHeader(inflater, "PET DOOR PERMISSIONS"));
@@ -58,12 +60,10 @@ public class ManageFragment extends android.support.v4.app.Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         android.support.v4.app.Fragment fragment = null;
-        String title = "";
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_pair:
                 fragment = new PairFragment();
-                title = "Pair Tag";
                 break;
             case R.id.action_edit:
                 //Todo: add edit
@@ -73,10 +73,12 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         }
 
         if (fragment != null) {
-            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+            android.support.v4.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.container, fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
 
-            ((MainActivity) getActivity()).setTitle(title);
+
         } else {
             Log.e("MainActivity", "Error in creating fragment");
             return false;
@@ -84,6 +86,10 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         return true;
     }
 
-
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Set title
+        ((MainActivity) getActivity()).setTitle(title);
+    }
 }

@@ -94,7 +94,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
-            displayView(0);
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ManageFragment()).commit();
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -160,10 +160,10 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 fragment = new ManageFragment();
                 break;
             case 1:
-                fragment = new LocateFragment();
+                fragment = new AccessFragment();
                 break;
             case 2:
-                fragment = new AccessFragment();
+                fragment = new LocateFragment();
                 break;
 // TODO: Add more fragments as needed.
 
@@ -172,14 +172,14 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }
 
         if (fragment != null) {
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment).commit();
+            android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.container, fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
 
             // update selected item and title, then close the drawer
             mDrawerList.setItemChecked(position, true);
             mDrawerList.setSelection(position);
-            setTitle(mNavTitles[position]);
             mDrawerLayout.closeDrawer(mDrawerList);
         } else {
             // error in creating fragment
