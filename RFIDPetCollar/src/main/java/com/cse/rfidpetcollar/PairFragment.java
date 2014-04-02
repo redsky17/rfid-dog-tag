@@ -6,16 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by Joseph on 3/27/14.
+ * Created by Joe Paul on 4/1/14.
  */
-public class AccessFragment extends android.support.v4.app.Fragment {
-    public AccessFragment(){}
+public class PairFragment extends android.support.v4.app.Fragment {
+    public PairFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.fragment_access, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_pair, container, false);
 
         return rootView;
     }

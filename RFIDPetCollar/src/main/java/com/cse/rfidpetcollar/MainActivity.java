@@ -76,13 +76,16 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 // TODO: Make this set the title to the selected view's title.
+                super.onDrawerClosed(view);
                 getSupportActionBar().setTitle(mTitle);
                 invalidateOptionsMenu();
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
                 getSupportActionBar().setTitle(getString(R.string.app_name));
+                getSupportActionBar().removeAllTabs();
                 invalidateOptionsMenu();
             }
         };
@@ -211,6 +214,4 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
             txtview.setTypeface(null, Typeface.NORMAL);
         }
     }
-
-
 }

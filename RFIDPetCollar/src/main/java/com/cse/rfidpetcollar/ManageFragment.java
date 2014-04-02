@@ -1,12 +1,11 @@
 package com.cse.rfidpetcollar;
 
-import android.app.Fragment;
-import android.content.ClipData;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -54,6 +53,37 @@ public class ManageFragment extends android.support.v4.app.Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         inflater.inflate(R.menu.manage_actions, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        android.support.v4.app.Fragment fragment = null;
+        String title = "";
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_pair:
+                fragment = new PairFragment();
+                title = "Pair Tag";
+                break;
+            case R.id.action_edit:
+                //Todo: add edit
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+
+            ((MainActivity) getActivity()).setTitle(title);
+        } else {
+            Log.e("MainActivity", "Error in creating fragment");
+            return false;
+        }
+        return true;
+    }
+
+
+
 }
