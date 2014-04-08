@@ -2,6 +2,7 @@ package com.cse.rfidpetcollar;
 
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.ListView;
 
 import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
 import com.cse.rfidpetcollar.model.RfidViewItem;
+import com.cse.rfidpetcollar.sql.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +37,17 @@ public class ManageFragment extends android.support.v4.app.Fragment {
 
         List<RfidViewItem> items = new ArrayList<RfidViewItem>();
         items.add(new RfidViewListHeader(inflater, "PET DOOR PERMISSIONS"));
-        items.add(new RfidViewListItem(inflater,"Sparky"));
-        items.add(new RfidViewListItem(inflater,"Mr. Whiskers"));
+
+        DatabaseHelper helper = new DatabaseHelper(this.getActivity());
+
+        List<Pet> pets = helper.getAllPets();
+
+        for (Pet pet : pets) {
+            items.add(new RfidViewListItem(inflater, pet.getName()));
+        }
+
+        //items.add(new RfidViewListItem(inflater,"Sparky"));
+        //items.add(new RfidViewListItem(inflater,"Mr. Whiskers"));
 
 
         RfidViewListAdapter adapter = new RfidViewListAdapter(this.getActivity(), items);
@@ -45,6 +56,22 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         setHasOptionsMenu(true);
 
         return rootView;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu){
+        try {
+            DrawerLayout mDrawerLayout = (DrawerLayout) getView().findViewById(R.id.drawer_layout);
+            ListView mDrawerList = (ListView) getView().findViewById(R.id.left_drawer);
+
+            boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+
+            menu.findItem(R.id.action_pair).setVisible(!drawerOpen);
+            menu.findItem(R.id.action_edit).setVisible(!drawerOpen);
+
+            super.onPrepareOptionsMenu(menu);
+        }
+        catch (Exception ex) { }
     }
 
     private void getListViewItems(){

@@ -111,7 +111,8 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 getSupportActionBar().setTitle(getString(R.string.app_name));
-                getSupportActionBar().removeAllTabs();
+                //getSupportActionBar().removeAllTabs();
+               // getSupportActionBar().
                 invalidateOptionsMenu();
             }
         };
@@ -183,6 +184,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         // Android design guidelines
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
         menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
