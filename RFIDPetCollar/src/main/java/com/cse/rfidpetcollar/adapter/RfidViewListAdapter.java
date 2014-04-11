@@ -17,7 +17,7 @@ public class RfidViewListAdapter extends ArrayAdapter<RfidViewItem> {
     private LayoutInflater mInflater;
 
     public enum RowType {
-        LIST_ITEM, HEADER_ITEM
+        LIST_ITEM, HEADER_ITEM, LIST_ACCESS
     }
 
     public RfidViewListAdapter(Context context, List<RfidViewItem> items) {
