@@ -293,17 +293,31 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     }
 
 
+    private void postScan()
+    {
+        if(deviceList.size() > 0)
+        {
+            for(BluetoothDevice device : deviceList)
+            {
+                if(device.getAddress().equals("F7:11:FE:5A:54:60"))
+                {
+                    mBLEservice.connect(device.getAddress());
+                }
+
+            }
+        }
+    }
     private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 
         @Override
         public void onLeScan(final BluetoothDevice device, final int rssi,
                              byte[] scanRecord) {
-
+            Log.i(TAG, "New LE Device: " + device.getName() + " @ " + rssi);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run()
                 {
-                   deviceList.add(device);
+                        deviceList.add(device);
                 }
             });
         }
@@ -323,21 +337,8 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 final ParcelUuid UUID[] = { new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_RX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_TX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_SERVICE) };
 
                 deviceList = new ArrayList<BluetoothDevice>();
-                //mBLEservice.connect(RBLService.)
 
                 scanLeDevice(true);
-
-                if(deviceList.size() > 0)
-                {
-                    for(BluetoothDevice device : deviceList)
-                    {
-                        if(Arrays.equals(device.getUuids(), UUID))
-                        {
-                            mBLEservice.connect(device.getAddress());
-                        }
-
-                    }
-                }
             }
             else
             {
@@ -389,8 +390,6 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     private void getGattService(BluetoothGattService gattService) {
         if (gattService == null)
             return;
-
-
 
         BluetoothGattCharacteristic characteristicTx = gattService
                 .getCharacteristic(RBLService.UUID_BLE_SHIELD_TX);
