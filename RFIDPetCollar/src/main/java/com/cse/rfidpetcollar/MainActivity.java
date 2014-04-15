@@ -61,9 +61,9 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     // Bluetooth needed members
     private RBLService mBLEservice;
     private BluetoothAdapter mBLEAdapter;
-    private List<BluetoothDevice> deviceList;
+    private ArrayList<BluetoothDevice> deviceList;
 
-    private final long SCAN_PERIOD = 1000;
+    private final long SCAN_PERIOD = 15000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +131,23 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
         final BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBLEAdapter = mBluetoothManager.getAdapter();
+
+        if(!mBLEAdapter.isEnabled()) {
+            Log.e(TAG, "Bluetooth not enabled");
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Bluetooth not enabled!")
+                    .setMessage("Go to settings and turn it on?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO: take user to settings
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
+        }
 
         Intent mBLEIntent = new Intent(this, RBLService.class);
         bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -253,24 +270,28 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }
     }
 
-    private void scanLeDevice(final UUID UUIDZ[]) {
-        new Thread() {
+    private boolean mScanning;
+    private Handler mHandler = new Handler();
 
-            @Override
-            public void run() {
-
-                mBLEAdapter.startLeScan(UUIDZ, mLeScanCallback);
-
-                try {
-                    Thread.sleep(SCAN_PERIOD);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            // Stops scanning after a pre-defined scan period.
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScanning = false;
+                    mBLEAdapter.stopLeScan(mLeScanCallback);
                 }
+            }, SCAN_PERIOD);
 
-                mBLEAdapter.startLeScan(UUIDZ, mLeScanCallback);
-            }
-        }.start();
+            mScanning = true;
+            mBLEAdapter.startLeScan(mLeScanCallback);
+        } else {
+            mScanning = false;
+            mBLEAdapter.stopLeScan(mLeScanCallback);
+        }
     }
+
 
     private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 
@@ -280,11 +301,9 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
             runOnUiThread(new Runnable() {
                 @Override
-                public void run() {
-                    if (device != null) {
-                       // what to do when we scan for device - save all devices, then find the BLE shield
-                       deviceList.add(device);
-                    }
+                public void run()
+                {
+                   deviceList.add(device);
                 }
             });
         }
@@ -306,7 +325,8 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 deviceList = new ArrayList<BluetoothDevice>();
                 //mBLEservice.connect(RBLService.)
 
-                scanLeDevice(UUIDZ);
+                scanLeDevice(true);
+
                 if(deviceList.size() > 0)
                 {
                     for(BluetoothDevice device : deviceList)

@@ -61,6 +61,7 @@ public class RBLService extends Service {
 			.fromString(RBLGattAttributes.BLE_SHIELD_SERVICE);
 
 	private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+
 		@Override
 		public void onConnectionStateChange(BluetoothGatt gatt, int status,
 				int newState) {
@@ -330,15 +331,5 @@ public class RBLService extends Service {
 
 		return mBluetoothGatt.getService(UUID_BLE_SHIELD_SERVICE);
 	}
-
-    public BluetoothAdapter getmBluetoothAdapter()
-    {
-        return mBluetoothAdapter;
-    }
-
-    public BluetoothManager getmBluetoothManager()
-    {
-        return mBluetoothManager;
-    }
 }
 
