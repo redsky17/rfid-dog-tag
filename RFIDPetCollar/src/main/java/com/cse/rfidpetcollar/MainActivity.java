@@ -301,12 +301,13 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
             {
                 if(device.getAddress().equals("F7:11:FE:5A:54:60"))
                 {
-                    mBLEservice.connect(device.getAddress());
+                    //mBLEservice.connect(device.getAddress());
                 }
 
             }
         }
     }
+
     private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 
         @Override
@@ -317,7 +318,10 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 @Override
                 public void run()
                 {
-                        deviceList.add(device);
+                    if(device.getAddress().equals("F7:11:FE:5A:54:60"))
+                    {
+                       mBLEservice.connect(device.getAddress());
+                    }
                 }
             });
         }
@@ -328,17 +332,19 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         @Override
         public void onServiceConnected(ComponentName componentName,
                                        IBinder service) {
+            //final UUID UUIDZ[] = {mBLEservice.UUID_BLE_SHIELD_RX, mBLEservice.UUID_BLE_SHIELD_TX, mBLEservice.UUID_BLE_SHIELD_SERVICE};
+            //final ParcelUuid UUID[] = { new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_RX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_TX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_SERVICE) };
+
+            boolean enabled;
+            deviceList = new ArrayList<BluetoothDevice>();
+
             mBLEservice = ((RBLService.LocalBinder) service)
                     .getService();
-            if (mBLEservice.initialize())            // need API ver 18 for this, might need to change
+
+            if (enabled = mBLEservice.initialize())
             {
                 // BLE initialized correctly
-                final UUID UUIDZ[] = {mBLEservice.UUID_BLE_SHIELD_RX, mBLEservice.UUID_BLE_SHIELD_TX, mBLEservice.UUID_BLE_SHIELD_SERVICE};
-                final ParcelUuid UUID[] = { new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_RX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_TX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_SERVICE) };
-
-                deviceList = new ArrayList<BluetoothDevice>();
-
-                scanLeDevice(true);
+                scanLeDevice(enabled);
             }
             else
             {
