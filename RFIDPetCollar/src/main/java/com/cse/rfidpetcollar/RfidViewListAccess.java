@@ -1,5 +1,6 @@
 package com.cse.rfidpetcollar;
 
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -8,18 +9,20 @@ import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
 import com.cse.rfidpetcollar.model.RfidViewItem;
 
 import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 /**
  * Created by Joe Paul on 4/10/14.
  */
 public class RfidViewListAccess implements RfidViewItem {
-    private final String  petName;
-    private Time time;
+    private Date date;
     private final LayoutInflater inflater;
 
-    public RfidViewListAccess(LayoutInflater inflater, String text1, Time time1) {
-        this.petName = text1;
-        this.time = time1;
+    public RfidViewListAccess(LayoutInflater inflater, Date date1) {
+        this.date = date1;
         this.inflater = inflater;
     }
 
@@ -37,11 +40,10 @@ public class RfidViewListAccess implements RfidViewItem {
             view = convertView;
         }
 
-        TextView name = (TextView) view.findViewById(R.id.pet_name);
-        name.setText(petName);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy [HH:mm:ss]");
 
-        TextView time2 = (TextView) view.findViewById(R.id.access_time);
-        time2.setText(time.toString());
+        TextView date2 = (TextView) view.findViewById(R.id.access_date);
+        date2.setText(dateFormat.format(date));
 
         return view;
     }
