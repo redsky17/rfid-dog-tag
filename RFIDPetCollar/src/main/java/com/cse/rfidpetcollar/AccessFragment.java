@@ -25,13 +25,14 @@ public class AccessFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_access, container, false);
+        ((MainActivity) getActivity()).setTitle(title);
+
         ListView mListView = (ListView) rootView.findViewById(R.id.list_access);
+        List<RfidViewItem> items = new ArrayList<RfidViewItem>();
+
         Date testDateA = new Date(114, 4, 22, 19, 30, 45);
         Date testDateB = new Date(114, 4, 20, 7, 25, 15);
 
-        ((MainActivity) getActivity()).setTitle(title);
-
-        List<RfidViewItem> items = new ArrayList<RfidViewItem>();
         items.add(new RfidViewListHeader(inflater, "Sparky"));
         items.add(new RfidViewListAccess(inflater, testDateA));
         items.add(new RfidViewListAccess(inflater, testDateB));

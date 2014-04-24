@@ -4,34 +4,17 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:hint="Tag Name "
-        android:ems="10"
-        android:id="@+id/tag_name"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="numberSigned"
-        android:ems="10"
-        android:id="@+id/tag_id"
-        android:layout_below="@+id/tag_name"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:hint="Tag Id " />
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Tag"
-        android:id="@+id/add_tag"
-        android:layout_below="@+id/tag_id"
+        android:text="Scan for tags"
+        android:id="@+id/scan_tags"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <ListView
+        android:id="@+id/list_pair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/scan_tags" />
 </RelativeLayout>

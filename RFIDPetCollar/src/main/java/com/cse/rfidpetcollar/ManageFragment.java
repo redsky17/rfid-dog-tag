@@ -39,7 +39,6 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         items.add(new RfidViewListHeader(inflater, "PET DOOR PERMISSIONS"));
 
         DatabaseHelper helper = new DatabaseHelper(this.getActivity());
-
         List<Pet> pets = helper.getAllPets();
 
         for (Pet pet : pets) {
