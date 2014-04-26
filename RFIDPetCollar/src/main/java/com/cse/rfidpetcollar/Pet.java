@@ -1,5 +1,6 @@
 package com.cse.rfidpetcollar;
 
+import java.sql.Date;
 import java.sql.Time;
 
 /**
@@ -9,21 +10,22 @@ public class Pet {
     private int id;
     private String name;
     private String rfidId;
-    private Time accessTime;
+    private Date[] accessTimes;
+    private static final int MAX_ACCESS_SIZE = 10;
 
     public Pet() { }
 
     public Pet (String name, String rfidId){
         this.name = name;
         this.rfidId = rfidId;
-        this.accessTime = new Time(0);
+        this.accessTimes = new Date[MAX_ACCESS_SIZE];
     }
 
     public Pet (int id, String name, String rfidId) {
         this.id = id;
         this.name = name;
         this.rfidId = rfidId;
-        this.accessTime = new Time(0);
+        this.accessTimes = new Date[MAX_ACCESS_SIZE];
     }
 
     public void setId(int id) {
@@ -50,7 +52,7 @@ public class Pet {
         this.rfidId = rfidId;
     }
 
-    public Time getAccessTime() { return accessTime; }
+    public Date[] getAccessTimes() { return accessTimes; }
 
-    public void setAccessTime(Time accessTime) {this.accessTime = accessTime; }
+    public void addAccessTime(Date accessTime) {this.accessTimes[this.accessTimes.length] = accessTime; }
 }
