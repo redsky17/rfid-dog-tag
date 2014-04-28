@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:minHeight="?android:attr/listPreferredItemHeightLarge"
+    android:padding="8dp">
+
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    android:text="Tag Id"
+    android:id="@+id/tag_id"
+    android:layout_alignParentBottom="true"
+    android:layout_centerVertical="true"
+    android:layout_centerInParent="true"
+    android:layout_alignParentTop="true"
+    android:textSize="17sp"
+    android:paddingLeft="16dp"        />
+
+</LinearLayout>

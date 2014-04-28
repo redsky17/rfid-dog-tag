@@ -4,6 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
+import com.cse.rfidpetcollar.model.RfidViewItem;
+
+import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Joseph on 3/27/14.
@@ -18,6 +26,24 @@ public class AccessFragment extends android.support.v4.app.Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_access, container, false);
         ((MainActivity) getActivity()).setTitle(title);
+
+        ListView mListView = (ListView) rootView.findViewById(R.id.list_access);
+        List<RfidViewItem> items = new ArrayList<RfidViewItem>();
+
+        Date testDateA = new Date(114, 4, 22, 19, 30, 45);
+        Date testDateB = new Date(114, 4, 20, 7, 25, 15);
+
+        items.add(new RfidViewListHeader(inflater, "Sparky"));
+        items.add(new RfidViewListAccess(inflater, testDateA));
+        items.add(new RfidViewListAccess(inflater, testDateB));
+        items.add(new RfidViewListHeader(inflater, "Mr. Whiskers"));
+        items.add(new RfidViewListAccess(inflater, testDateA));
+        items.add(new RfidViewListAccess(inflater, testDateB));
+
+        RfidViewListAdapter adapter = new RfidViewListAdapter(this.getActivity(), items);
+        mListView.setAdapter(adapter);
+
+        setHasOptionsMenu(true);
 
         return rootView;
     }
