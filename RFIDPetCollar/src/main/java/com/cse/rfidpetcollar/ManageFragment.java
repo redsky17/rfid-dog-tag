@@ -1,9 +1,11 @@
 package com.cse.rfidpetcollar;
 
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
 import com.cse.rfidpetcollar.model.RfidViewItem;
@@ -26,12 +29,15 @@ public class ManageFragment extends android.support.v4.app.Fragment {
     public ManageFragment(){}
     private String title = "Manage Pets";
 
+    private ListView mListView;
+    private RfidViewListAdapter adapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_manage, container, false);
-        ListView mListView = (ListView) rootView.findViewById(R.id.list_manage);
+        mListView = (ListView) rootView.findViewById(R.id.list_manage);
 
         ((MainActivity) getActivity()).setTitle(title);
 
@@ -50,7 +56,7 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         //items.add(new RfidViewListItem(inflater,"Mr. Whiskers"));
 
 
-        RfidViewListAdapter adapter = new RfidViewListAdapter(this.getActivity(), items);
+        adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);
 
         setHasOptionsMenu(true);
@@ -92,9 +98,6 @@ public class ManageFragment extends android.support.v4.app.Fragment {
             case R.id.action_pair:
                 fragment = new PairFragment();
                 break;
-            case R.id.action_edit:
-                //Todo: add edit
-                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -118,5 +121,55 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         super.onResume();
         // Set title
         ((MainActivity) getActivity()).setTitle(title);
+    }
+
+    public static final class RfidListItemActionMode implements ActionMode.Callback {
+        Context ctx;
+
+        public RfidListItemActionMode(Context ctx){
+            this.ctx = ctx;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+
+            menu.add("Delete").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+            Toast toast = null;
+
+            ArrayList<RfidViewListItem> selectedListItems = new ArrayList<RfidViewListItem>();
+
+            StringBuilder selectedItems = new StringBuilder();
+
+            // get items selected
+            for (RfidViewListItem i : ((ManageFragment) ctx).adapter.mailList) {
+                if (i.isChecked()) {
+                    selectedListItems.add(i);
+                    selectedItems.append(i.getTitle()).append(", ");
+                }
+            }
+
+            if (item.getTitle().equals("Delete")) {
+                // Delete
+                toast = Toast.makeText(ctx, "Delete: " + selectedItems.toString(), Toast.LENGTH_SHORT);
+
+            }
+            if (toast != null) {
+                toast.show();
+            }
+            mode.finish();
+            return true;
+        }
     }
 }
