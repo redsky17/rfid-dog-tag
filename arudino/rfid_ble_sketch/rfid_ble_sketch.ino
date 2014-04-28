@@ -17,7 +17,11 @@
 //unsigned char INVENTORY[] = { 0x43, 0x04, 0x01, 0xcd}; // get rssi inventory
 int incoming=0;       //incoming from user
 int bytesread = 0; 
-char tag[10];         
+char tag[10];    // the tag that is read by the RFID reader
+char pairedTags[10][10]; // for simplicity's sake, I'm making this a fixed size array for up to 10 approved tags
+boolean isTagApproved[10]; // this is a parallel array for pairedTags for checking the permissions of the tag
+
+int numTags = 0;
 
 #define RX_Pin 2
 #define TX_Pin 3
@@ -36,6 +40,7 @@ void setup()
 }
 
 boolean readingTag = false;
+char pairingTag[10];
 
 void loop()
 {
@@ -81,7 +86,30 @@ void loop()
       {
         case 'R':   // query tag
             readingTag = true;
+            memcpy(pairingTag, tag, sizeof(pairingTag));
             break;
+        case 'P':  // accept and pair the tag
+            if (
+            
       }
   }
+}
+
+int find_index(char a[][], int num_elements, char b[] value)
+{
+   int i;
+   for (i=0; i<num_elements; i++)
+   {
+     bool found = true;
+     for (int j = 0; j < 10; j++)
+     {
+	 if (a[i][j] != b[j])
+	 {
+            found = false;
+	 }
+     }
+     if (found)
+     	return i;  /* it was found */
+   }
+   return(-1);  /* if it was not found */
 }
