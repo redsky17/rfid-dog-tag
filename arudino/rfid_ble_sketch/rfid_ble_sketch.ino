@@ -1,5 +1,10 @@
 #include <SoftwareSerial.h>
+
+#include <SPI.h>
+#include <boards.h>
 #include <ble_shield.h>
+#include <services.h>
+#include "Boards.h"
 //struct Res{
 //  unsigned char Tag_num;                   //number of tags detected
 //  unsigned char Rcard[12];        //EPC of each tag
