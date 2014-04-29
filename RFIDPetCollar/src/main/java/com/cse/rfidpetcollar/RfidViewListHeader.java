@@ -13,7 +13,7 @@ import com.cse.rfidpetcollar.model.RfidViewItem;
 public class RfidViewListHeader implements RfidViewItem {
     private final String         name;
 
-    public RfidViewListHeader(LayoutInflater inflater, String name) {
+    public RfidViewListHeader(String name) {
         this.name = name;
     }
 

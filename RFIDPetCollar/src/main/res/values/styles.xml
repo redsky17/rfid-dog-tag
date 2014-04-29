@@ -14,7 +14,7 @@
     <!-- ActionBar styles -->
     <style name="CustomActionBar"
         parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">#0099cc</item>
+        <item name="android:background">#cc0000</item>
     </style>
 
 </resources>

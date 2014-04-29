@@ -6,21 +6,21 @@
     <string name="action_settings">Settings</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
-    <string name="action_new">Pair Tag</string>
+    <string name="action_pair">Pair Tag</string>
     <string name="action_edit">Edit Tags</string>
     <!-- Navigation Drawer Entries -->
     <string-array name="nav_drawer_items">
         <item>Manage Pets</item>
-        <item>Locate My Pet</item>
         <item>Access Times</item>
+        <item>Locate Pets</item>
     </string-array>
 
     <!-- Navigation Drawer Icons -->
     <!-- Must be in the same order as the items! -->
     <array name="nav_drawer_icons">
-        <item>@drawable/ic_action_edit</item>
-        <item>@drawable/ic_action_map</item>
-        <item>@drawable/ic_action_map</item>
+        <item>@drawable/ic_action_paw</item>
+        <item>@drawable/ic_action_clock</item>
+        <item>@drawable/ic_action_globe</item>
     </array>
 
     <!-- Content Description -->

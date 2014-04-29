@@ -12,9 +12,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:textColor="#0099cc"/>
+        android:textColor="#cc0000"/>
 
-    <View android:background="#0099cc"
+    <View android:background="#cc0000"
         android:layout_width = "fill_parent"
         android:layout_height="1dip"
         android:layout_centerVertical ="true"
