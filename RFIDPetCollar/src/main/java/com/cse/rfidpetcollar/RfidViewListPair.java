@@ -1,6 +1,5 @@
 package com.cse.rfidpetcollar;
 
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -8,8 +7,6 @@ import android.widget.TextView;
 import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
 import com.cse.rfidpetcollar.model.RfidViewItem;
 
-import java.sql.Time;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -17,31 +14,29 @@ import java.util.Date;
 /**
  * Created by Joe Paul on 4/10/14.
  */
-public class RfidViewListAccess implements RfidViewItem {
-    private Date date;
+public class RfidViewListPair implements RfidViewItem {
+    private String tag;
 
-    public RfidViewListAccess( Date date1) {
-        this.date = date1;
+    public RfidViewListPair(String tagId) {
+        this.tag = tagId;
     }
 
     @Override
     public int getViewType() {
-        return RfidViewListAdapter.RowType.LIST_ACCESS.ordinal();
+        return RfidViewListAdapter.RowType.LIST_PAIR.ordinal();
     }
 
     @Override
     public View getView(LayoutInflater inflater, View convertView) {
         View view;
         if (convertView == null) {
-            view = (View) inflater.inflate(R.layout.list_access, null);
+            view = (View) inflater.inflate(R.layout.list_pair, null);
         } else {
             view = convertView;
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy [HH:mm:ss]");
-
-        TextView date2 = (TextView) view.findViewById(R.id.access_date);
-        date2.setText(dateFormat.format(date));
+        TextView tag2 = (TextView) view.findViewById(R.id.tag_id);
+        tag2.setText(tag);
 
         return view;
     }

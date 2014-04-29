@@ -64,9 +64,11 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     private ArrayList<BluetoothDevice> deviceList;
     private boolean mScanning;
     private Handler mHandler = new Handler();
-    private final long SCAN_PERIOD = 10000; // 10 sec
     private boolean alertDisplayed = false;
 
+
+    private final long SCAN_PERIOD = 15000;
+    private static final int REQUEST_ENABLE_BT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +104,9 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 R.string.drawer_close  /* "close drawer" description */
         ) {
 
-            /** Called when a drawer has settled in a completely closed state. */
+            /**
+             * Called when a drawer has settled in a completely closed state.
+             */
             public void onDrawerClosed(View view) {
                 // TODO: Make this set the title to the selected view's title.
                 super.onDrawerClosed(view);
@@ -110,12 +114,14 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 invalidateOptionsMenu();
             }
 
-            /** Called when a drawer has settled in a completely open state. */
+            /**
+             * Called when a drawer has settled in a completely open state.
+             */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 getSupportActionBar().setTitle(getString(R.string.app_name));
                 //getSupportActionBar().removeAllTabs();
-               // getSupportActionBar().
+                // getSupportActionBar().
                 invalidateOptionsMenu();
             }
         };
@@ -131,12 +137,10 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
 
-
         final BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBLEAdapter = mBluetoothManager.getAdapter();
 
-        if(alertDisplayed == false)
-        {
+        if (alertDisplayed == false) {
             alertDisplayed = true;                  // only displays the alert one time
 
             if (!mBLEAdapter.isEnabled()) {
@@ -158,19 +162,45 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                             }
                         }).show();
             }
+
+            if (mBLEAdapter == null) {
+                Toast.makeText(this, "BLE not supported.  BLE is required for this app to work.", Toast.LENGTH_SHORT)
+                        .show();
+                finish();
+                return;
+            }
+
+            if (!mBLEAdapter.isEnabled()) {
+                Log.e(TAG, "Bluetooth not enabled");
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Bluetooth not enabled!")
+                        .setMessage("Go to settings and turn it on?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO: take user to settings
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent enableBtIntent = new Intent(
+                                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                            }
+                        }).show();
+            }
+
+
+            Intent mBLEIntent = new Intent(this, RBLService.class);
+            bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
         }
-
-
-        Intent mBLEIntent = new Intent(this, RBLService.class);
-        bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onResume()
     {
         // make sure bluetooth still enable, sync with app
-        super.onResume(); if (!mBLEAdapter.isEnabled()) {
-        alertDisplayed = true;
+        super.onResume();
+        if (!mBLEAdapter.isEnabled()) {
         Log.e(TAG, "Bluetooth not enabled");
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Bluetooth not enabled!")
@@ -352,7 +382,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }
     };
 
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+    public final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName,

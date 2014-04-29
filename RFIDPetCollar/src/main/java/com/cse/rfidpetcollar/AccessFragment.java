@@ -9,7 +9,7 @@ import android.widget.ListView;
 import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
 import com.cse.rfidpetcollar.model.RfidViewItem;
 
-import java.sql.Time;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +25,20 @@ public class AccessFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_access, container, false);
-        ListView mListView = (ListView) rootView.findViewById(R.id.list_access);
-        Time testTime = new Time(950);
-
         ((MainActivity) getActivity()).setTitle(title);
 
+        ListView mListView = (ListView) rootView.findViewById(R.id.list_access);
         List<RfidViewItem> items = new ArrayList<RfidViewItem>();
-        items.add(new RfidViewListHeader(inflater, "PET DOOR LAST ACCESS TIMES"));
 
-        items.add(new RfidViewListAccess(inflater,"Sparky", testTime));
-        items.add(new RfidViewListAccess(inflater,"Mr. Whiskers", testTime));
+        Date testDateA = new Date(114, 4, 22, 19, 30, 45);
+        Date testDateB = new Date(114, 4, 20, 7, 25, 15);
+
+        items.add(new RfidViewListHeader("Sparky"));
+        items.add(new RfidViewListAccess(testDateA));
+        items.add(new RfidViewListAccess(testDateB));
+        items.add(new RfidViewListHeader("Mr. Whiskers"));
+        items.add(new RfidViewListAccess(testDateA));
+        items.add(new RfidViewListAccess(testDateB));
 
         RfidViewListAdapter adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);

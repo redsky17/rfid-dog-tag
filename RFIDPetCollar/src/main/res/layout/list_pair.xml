@@ -6,14 +6,12 @@
     android:minHeight="?android:attr/listPreferredItemHeightLarge"
     android:padding="8dp">
 
-
-
     <TextView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="Date"
-    android:id="@+id/access_date"
+    android:text="Tag Id"
+    android:id="@+id/tag_id"
     android:layout_alignParentBottom="true"
     android:layout_centerVertical="true"
     android:layout_centerInParent="true"
