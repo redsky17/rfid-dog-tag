@@ -1,6 +1,7 @@
 package com.cse.rfidpetcollar;
 
 import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -27,6 +28,8 @@ import java.util.List;
  */
 public class ManageFragment extends android.support.v4.app.Fragment {
     public ManageFragment(){}
+
+    private BluetoothDevice mDevice;
     private String title = "Manage Pets";
 
     private ListView mListView;
@@ -59,6 +62,13 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         mListView.setAdapter(adapter);
 
         setHasOptionsMenu(true);
+
+        Bundle args = getArguments();
+        //if (args != null) {
+        //    mDevice = args.getParcelable(MainActivity.EXTRAS_DEVICE);
+        //} else {
+        //    Toast.makeText(getActivity(), "Arguments null", Toast.LENGTH_LONG).show();
+        //}
 
         return rootView;
     }
@@ -102,6 +112,10 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         }
 
         if (fragment != null) {
+            //Bundle bundle = new Bundle();
+            //bundle.putParcelable(MainActivity.EXTRAS_DEVICE, mDevice);
+            //fragment.setArguments(bundle);
+
             android.support.v4.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(R.id.container, fragment);
             transaction.addToBackStack(null);

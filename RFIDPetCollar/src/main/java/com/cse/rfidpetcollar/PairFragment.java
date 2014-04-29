@@ -4,11 +4,15 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,12 +49,38 @@ public class PairFragment extends android.support.v4.app.Fragment {
 
     // Bluetooth needed members
     private RBLService mBLEservice;
-    private BluetoothAdapter mBLEAdapter;
-    private ArrayList<BluetoothDevice> deviceList;
-
+    private BluetoothDevice mDevice;
+    private String mDeviceAddress;
+    private String mDeviceName;
     private Map<UUID, BluetoothGattCharacteristic> map = new HashMap<UUID, BluetoothGattCharacteristic>();
 
-    private final long SCAN_PERIOD = 15000;
+    public final ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName componentName,
+                                       IBinder service) {
+            //final UUID UUIDZ[] = {mBLEservice.UUID_BLE_SHIELD_RX, mBLEservice.UUID_BLE_SHIELD_TX, mBLEservice.UUID_BLE_SHIELD_SERVICE};
+            //final ParcelUuid UUID[] = { new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_RX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_TX), new ParcelUuid(mBLEservice.UUID_BLE_SHIELD_SERVICE) };
+
+             mBLEservice = ((RBLService.LocalBinder) service)
+                    .getService();
+
+            if (!mBLEservice.initialize())
+            {
+                Log.i("RFID_PET_COLLAR", "Unable to initialize Bluetooth in PairFragment");
+            }
+            else
+            {
+                mBLEservice.connect(mDeviceAddress);
+                Toast.makeText(getActivity(), "Connected to: " + mDeviceName, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBLEservice = null;
+        }
+    };
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -79,28 +109,12 @@ public class PairFragment extends android.support.v4.app.Fragment {
         adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);
 
-        final BluetoothManager mBluetoothManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
-        mBLEAdapter = mBluetoothManager.getAdapter();
-
-        if (!mBLEAdapter.isEnabled()) {
-            Log.e("RFID_Pet_Collar", "Bluetooth not enabled");
-            new AlertDialog.Builder(PairFragment.this.getActivity())
-                    .setTitle("Bluetooth not enabled!")
-                    .setMessage("Go to settings and turn it on?")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // TODO: take user to settings
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    }).show();
-        }
-
-        Intent mBLEIntent = new Intent(this.getActivity(), RBLService.class);
-        getActivity().bindService(mBLEIntent, ((MainActivity) getActivity()).mServiceConnection, Context.BIND_AUTO_CREATE);
+        //Bundle args = getArguments();
+        //if (args != null) {
+        //    mDevice = args.getParcelable(MainActivity.EXTRAS_DEVICE);
+        //} else {
+        //    Toast.makeText(getActivity(), "Arguments null", Toast.LENGTH_LONG).show();
+        //}
 
         setHasOptionsMenu(true);
         scan.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +133,9 @@ public class PairFragment extends android.support.v4.app.Fragment {
                 mBLEservice.writeCharacteristic(characteristic);
             }
         });
+
+        Intent gattServiceIntent = new Intent(getActivity(), RBLService.class);
+        getActivity().bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
         return rootView;
     }
@@ -141,6 +158,12 @@ public class PairFragment extends android.support.v4.app.Fragment {
         super.onResume();
         // Set title
         ((MainActivity) getActivity()).setTitle(title);
+
+        if (((MainActivity) getActivity()).mDevice != null) {
+            mDeviceName = ((MainActivity) getActivity()).mDevice.getName();
+            mDeviceAddress = ((MainActivity) getActivity()).mDevice.getAddress();
+        }
+
 
         getActivity().registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }

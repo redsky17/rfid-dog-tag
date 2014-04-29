@@ -46,10 +46,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends android.support.v7.app.ActionBarActivity {
+    public static final String EXTRAS_DEVICE = "EXTRAS_DEVICE";
+
     private NavDrawerListAdapter adapter;                   // adapter for menu items
     private String[] mNavTitles;                            // each menu item
     private TypedArray mNavIcons;                           // icon for each menu item
     private ArrayList<NavDrawerItem> navDrawerItems;        // each menu item with icon
+
+
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -61,6 +65,7 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     // Bluetooth needed members
     private RBLService mBLEservice;
     private BluetoothAdapter mBLEAdapter;
+    public static BluetoothDevice mDevice;
     private ArrayList<BluetoothDevice> deviceList;
     private boolean mScanning;
     private Handler mHandler = new Handler();
@@ -140,59 +145,17 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         final BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBLEAdapter = mBluetoothManager.getAdapter();
 
-        if (alertDisplayed == false) {
-            alertDisplayed = true;                  // only displays the alert one time
 
-            if (!mBLEAdapter.isEnabled()) {
-                alertDisplayed = true;
-                Log.e(TAG, "Bluetooth not enabled");
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Bluetooth not enabled!")
-                        .setMessage("Turn it on?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (mBLEAdapter.getState() == BluetoothAdapter.STATE_OFF) {
-                                    mBLEAdapter.enable();                                           // force BT on
-                                }
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        }).show();
-            }
-
-            if (mBLEAdapter == null) {
-                Toast.makeText(this, "BLE not supported.  BLE is required for this app to work.", Toast.LENGTH_SHORT)
-                        .show();
-                finish();
-                return;
-            }
-
-            if (!mBLEAdapter.isEnabled()) {
-                Log.e(TAG, "Bluetooth not enabled");
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Bluetooth not enabled!")
-                        .setMessage("Go to settings and turn it on?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // TODO: take user to settings
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent enableBtIntent = new Intent(
-                                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                            }
-                        }).show();
-            }
-
-
-            Intent mBLEIntent = new Intent(this, RBLService.class);
-            bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
+        if (mBLEAdapter == null) {
+            Toast.makeText(this, "BLE not supported.  BLE is required for this app to work.", Toast.LENGTH_SHORT)
+                    .show();
+            finish();
+            return;
         }
+
+        //Intent mBLEIntent = new Intent(this, RBLService.class);
+        //bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
+
     }
 
     @Override
@@ -287,6 +250,10 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }
 
         if (fragment != null) {
+            //Bundle bundle = new Bundle();
+            //bundle.putParcelable(MainActivity.EXTRAS_DEVICE, mDevice);
+            //fragment.setArguments(bundle);
+
             android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.container, fragment);
             transaction.addToBackStack(null);
@@ -373,9 +340,9 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 @Override
                 public void run()
                 {
-                    if(device.getAddress().equals("F7:11:FE:5A:54:60"))
+                    if(device != null && (device.getAddress().equals("F7:11:FE:5A:54:60") || device.getName().contains("Shield")))
                     {
-                       mBLEservice.connect(device.getAddress());
+                       mDevice = device;
                     }
                 }
             });
