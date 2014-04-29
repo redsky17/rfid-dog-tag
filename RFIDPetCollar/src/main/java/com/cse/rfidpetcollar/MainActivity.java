@@ -62,8 +62,11 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     private RBLService mBLEservice;
     private BluetoothAdapter mBLEAdapter;
     private ArrayList<BluetoothDevice> deviceList;
+    private boolean mScanning;
+    private Handler mHandler = new Handler();
+    private final long SCAN_PERIOD = 10000; // 10 sec
+    private boolean alertDisplayed = false;
 
-    private final long SCAN_PERIOD = 15000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,22 +135,31 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         final BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBLEAdapter = mBluetoothManager.getAdapter();
 
-        if(!mBLEAdapter.isEnabled()) {
-            Log.e(TAG, "Bluetooth not enabled");
-            new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("Bluetooth not enabled!")
-                    .setMessage("Go to settings and turn it on?")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // TODO: take user to settings
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+        if(alertDisplayed == false)
+        {
+            alertDisplayed = true;                  // only displays the alert one time
 
-                        }
-                    }).show();
+            if (!mBLEAdapter.isEnabled()) {
+                alertDisplayed = true;
+                Log.e(TAG, "Bluetooth not enabled");
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Bluetooth not enabled!")
+                        .setMessage("Turn it on?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (mBLEAdapter.getState() == BluetoothAdapter.STATE_OFF) {
+                                    mBLEAdapter.enable();                                           // force BT on
+                                }
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).show();
+            }
         }
+
 
         Intent mBLEIntent = new Intent(this, RBLService.class);
         bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -157,7 +169,25 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     protected void onResume()
     {
         // make sure bluetooth still enable, sync with app
-        super.onResume();
+        super.onResume(); if (!mBLEAdapter.isEnabled()) {
+        alertDisplayed = true;
+        Log.e(TAG, "Bluetooth not enabled");
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Bluetooth not enabled!")
+                .setMessage("Turn it on?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (mBLEAdapter.getState() == BluetoothAdapter.STATE_OFF) {
+                            mBLEAdapter.enable();                                           // force BT on
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -204,8 +234,6 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
         return super.onPrepareOptionsMenu(menu);
     }
-
-
     /**
      * Diplays fragment view for selected nav drawer list item
      */
@@ -269,9 +297,6 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
             txtview.setTypeface(null, Typeface.NORMAL);
         }
     }
-
-    private boolean mScanning;
-    private Handler mHandler = new Handler();
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
@@ -354,7 +379,15 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                         .setMessage("Go to settings and turn it on?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // take user to settings
+                                if (mBLEAdapter != null) {
+                                    if (mBLEAdapter.getState() == BluetoothAdapter.STATE_ON) {
+                                        mBLEAdapter.disable();
+                                    } else if (mBLEAdapter.getState() == BluetoothAdapter.STATE_OFF) {
+                                        mBLEAdapter.enable();
+                                    } else {
+                                        //State.INTERMEDIATE_STATE;
+                                    }
+                                }
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
