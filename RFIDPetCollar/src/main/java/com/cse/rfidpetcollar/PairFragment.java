@@ -127,7 +127,7 @@ public class PairFragment extends android.support.v4.app.Fragment {
                 // Set up the input
                 final EditText input = new EditText(getActivity());
                 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(input);
 
                 // Set up the buttons
@@ -169,6 +169,18 @@ public class PairFragment extends android.support.v4.app.Fragment {
 
                                     dbHelper.addPet(newPet);
                                 }
+
+                                // send "P" command to bluetooth to actually pair the tag
+                                BluetoothGattCharacteristic characteristic = map
+                                        .get(RBLService.UUID_BLE_SHIELD_TX);
+
+                                byte[] buf = {'P'};
+
+                                if (characteristic != null) {
+                                    characteristic.setValue(buf);
+
+                                    mBLEservice.writeCharacteristic(characteristic);
+                                }
                             }
                         }
                     }
@@ -195,17 +207,16 @@ public class PairFragment extends android.support.v4.app.Fragment {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                items.clear();
-
                 // send "R" command to bluetooth to get available tags
                 BluetoothGattCharacteristic characteristic = map
                         .get(RBLService.UUID_BLE_SHIELD_TX);
 
                 byte[] buf = {'R'};
+                if (characteristic != null) {
+                    characteristic.setValue(buf);
 
-                characteristic.setValue(buf);
-
-                mBLEservice.writeCharacteristic(characteristic);
+                    mBLEservice.writeCharacteristic(characteristic);
+                }
             }
         });
 
@@ -220,6 +231,7 @@ public class PairFragment extends android.support.v4.app.Fragment {
             @Override
             public void run() {
                 if (byteArray != null && byteArray.length != 0) {
+                    items.clear();
                     String data = new String(byteArray);
                     items.add(new RfidViewListHeader("Available Tags"));
 
@@ -259,8 +271,10 @@ public class PairFragment extends android.support.v4.app.Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        mBLEservice.disconnect();
-        mBLEservice.close();
+        if (mBLEservice != null) {
+            mBLEservice.disconnect();
+            mBLEservice.close();
+        }
     }
 
     private void getGattService(BluetoothGattService gattService) {

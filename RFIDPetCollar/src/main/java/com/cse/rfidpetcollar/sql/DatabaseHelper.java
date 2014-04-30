@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_CATEGORY = "category";
     private static final String KEY_PETNAME = "pet_name";
     private static final String KEY_PETID = "pet_id";
+    private static final String KEY_ALLOWED = "allowed";
 
     public DatabaseHelper(Context context) {
         super (context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_RFID + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_CATEGORY + " TEXT,"
-                + KEY_PETNAME + " TEXT," + KEY_PETID + " TEXT" + ")";
+                + KEY_PETNAME + " TEXT," + KEY_PETID + " TEXT," + KEY_ALLOWED + " INTEGER" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
 
@@ -55,7 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_CATEGORY, "");
         values.put(KEY_PETNAME, petName);
         values.put(KEY_PETID, petRfidId);
-
+        values.put(KEY_ALLOWED, pet.getAllowed());
         db.insert(TABLE_RFID, null, values);
         db.close();
     }
@@ -87,6 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 pet.setId(Integer.parseInt(cursor.getString(0)));
                 pet.setName(cursor.getString(2));
                 pet.setRfidId(cursor.getString(3));
+                pet.setAllowed((cursor.getInt(4) == 1)? true : false);
 
                 pets.add(pet);
             } while (cursor.moveToNext());
@@ -111,7 +113,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_PETNAME, pet.getName());
         values.put(KEY_PETID, pet.getRfidId());
-
+        values.put(KEY_ALLOWED, pet.getAllowed());
         // updating row
         return db.update(TABLE_RFID, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(pet.getId()) });

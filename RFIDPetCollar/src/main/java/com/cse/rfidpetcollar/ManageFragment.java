@@ -2,8 +2,16 @@ package com.cse.rfidpetcollar;
 
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.ActionMode;
@@ -13,7 +21,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
@@ -21,7 +34,10 @@ import com.cse.rfidpetcollar.model.RfidViewItem;
 import com.cse.rfidpetcollar.sql.DatabaseHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Joseph on 2/5/14.
@@ -29,7 +45,7 @@ import java.util.List;
 public class ManageFragment extends android.support.v4.app.Fragment {
     public ManageFragment(){}
 
-    private BluetoothDevice mDevice;
+    //private BluetoothDevice mDevice;
     private String title = "Manage Pets";
 
     private ListView mListView;
@@ -51,7 +67,7 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         List<Pet> pets = helper.getAllPets();
 
         for (Pet pet : pets) {
-            items.add(new RfidViewListItem(pet.getName(), pet.getRfidId()));
+            items.add(new RfidViewListItem(pet.getName(), pet.getRfidId(), pet.getAllowed()));
         }
 
         //items.add(new RfidViewListItem(inflater,"Sparky"));
@@ -60,6 +76,33 @@ public class ManageFragment extends android.support.v4.app.Fragment {
 
         adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //RfidViewListAdapter adapter = (RfidViewListAdapter) mListView.getAdapter();
+
+                //HashMap<String,Object> hm = (HashMap) adapter.getItem(position);
+
+                /** The clicked Item in the ListView */
+                RelativeLayout rLayout = (RelativeLayout) view;
+
+                /** Getting the toggle button corresponding to the clicked item */
+                Switch tgl = (Switch) rLayout.findViewById(R.id.toggle_button);
+
+                String petName = ((TextView)rLayout.findViewById(R.id.list_content)).getText().toString();
+
+                String rfidId = null;
+
+                DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+
+                if(tgl.isChecked()){
+                    tgl.setChecked(false);
+                }else{
+                    tgl.setChecked(true);
+                }
+            }
+        });
 
         setHasOptionsMenu(true);
 
@@ -134,6 +177,12 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         super.onResume();
         // Set title
         ((MainActivity) getActivity()).setTitle(title);
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
     }
 
     public static final class RfidListItemActionMode implements ActionMode.Callback {

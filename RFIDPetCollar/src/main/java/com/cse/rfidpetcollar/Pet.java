@@ -10,6 +10,7 @@ public class Pet {
     private int id;
     private String name;
     private String rfidId;
+    private boolean allowed = false;
     private Date[] accessTimes;
     private static final int MAX_ACCESS_SIZE = 10;
 
@@ -19,6 +20,7 @@ public class Pet {
         this.name = name;
         this.rfidId = rfidId;
         this.accessTimes = new Date[MAX_ACCESS_SIZE];
+        this.allowed = false;
     }
 
     public Pet (int id, String name, String rfidId) {
@@ -26,7 +28,11 @@ public class Pet {
         this.name = name;
         this.rfidId = rfidId;
         this.accessTimes = new Date[MAX_ACCESS_SIZE];
+        this.allowed = false;
     }
+
+    public boolean getAllowed() { return this.allowed;}
+    public void setAllowed(boolean allowed) { this.allowed = allowed;}
 
     public void setId(int id) {
         this.id = id;
