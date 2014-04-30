@@ -13,19 +13,25 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.cse.rfidpetcollar.adapter.RfidViewListAdapter;
 import com.cse.rfidpetcollar.model.RfidViewItem;
+import com.cse.rfidpetcollar.sql.DatabaseHelper;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -109,6 +115,75 @@ public class PairFragment extends android.support.v4.app.Fragment {
         adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            String petName = null;
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Enter the pet to associate with this tag.");
+
+                // Set up the input
+                final EditText input = new EditText(getActivity());
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                builder.setView(input);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        petName = input.getText().toString();
+
+                        if (petName != null && !petName.equals("")) {
+                            LinearLayout layout = (LinearLayout)view;
+
+                            String rfidId = ((TextView)layout.findViewById(R.id.tag_id)).getText().toString();
+
+                            if (rfidId != null) {
+                                DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
+
+                                List<Pet> pets = dbHelper.getAllPets();
+
+                                if (pets.size() > 0) {
+                                    boolean added = false;
+                                    for (Pet p : pets) {
+                                        if (p.getName() != null && p.getName().equals(petName)){
+                                            p.setRfidId(rfidId);
+                                            dbHelper.updatePet(p);
+                                            added = true;
+                                        }
+                                    }
+                                    if (!added) {
+                                        Pet newPet = new Pet();
+                                        newPet.setName(petName);
+                                        newPet.setRfidId(rfidId);
+
+                                        dbHelper.addPet(newPet);
+                                    }
+                                } else {
+                                    Pet newPet = new Pet();
+                                    newPet.setName(petName);
+                                    newPet.setRfidId(rfidId);
+
+                                    dbHelper.addPet(newPet);
+                                }
+                            }
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
         //Bundle args = getArguments();
         //if (args != null) {
         //    mDevice = args.getParcelable(MainActivity.EXTRAS_DEVICE);
@@ -140,17 +215,21 @@ public class PairFragment extends android.support.v4.app.Fragment {
         return rootView;
     }
 
-    private void displayData(byte[] byteArray) {
+    private void displayData(final byte[] byteArray) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (byteArray != null && byteArray.length != 0) {
+                    String data = new String(byteArray);
+                    items.add(new RfidViewListHeader("Available Tags"));
 
-        if (byteArray != null) {
-            String data = new String(byteArray);
-            items.add(new RfidViewListHeader("Available Tags"));
-
-            items.add(new RfidViewListPair(data));
-            adapter.notifyDataSetChanged();
-        } else {
-            Toast.makeText(this.getActivity(), "No RFID Tags Found", Toast.LENGTH_LONG).show();
-        }
+                    items.add(new RfidViewListPair(data));
+                    adapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getActivity(), "No RFID Tags Found", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     @Override

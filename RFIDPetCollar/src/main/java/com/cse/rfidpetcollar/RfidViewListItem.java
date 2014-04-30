@@ -11,12 +11,14 @@ import com.cse.rfidpetcollar.model.RfidViewItem;
  * Created by Joseph on 2/5/14.
  */
 public class RfidViewListItem implements RfidViewItem {
-    private final String         str1;
+    private final String         name;
+    private final String         rfidId;
     //private final LayoutInflater inflater;
     private boolean isChecked = false;
 
-    public RfidViewListItem(String text1) {
-        this.str1 = text1;
+    public RfidViewListItem(String text1, String rfidId) {
+        this.name = text1;
+        this.rfidId = rfidId;
         //this.inflater = inflater;
     }
 
@@ -37,9 +39,13 @@ public class RfidViewListItem implements RfidViewItem {
 
         TextView text1 = (TextView) view.findViewById(R.id.list_content);
 
-        text1.setText(str1);
+        text1.setText(name);
 
         return view;
+    }
+
+    public String getRfidId(){
+        return rfidId;
     }
 
     public boolean isChecked(){

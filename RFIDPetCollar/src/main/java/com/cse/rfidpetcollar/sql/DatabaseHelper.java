@@ -50,8 +50,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_PETNAME, pet.getName());
-        values.put(KEY_PETID, pet.getRfidId());
+        String petName = pet.getName();
+        String petRfidId = pet.getRfidId();
+        values.put(KEY_CATEGORY, "");
+        values.put(KEY_PETNAME, petName);
+        values.put(KEY_PETID, petRfidId);
 
         db.insert(TABLE_RFID, null, values);
         db.close();
@@ -65,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[] {String.valueOf(id)}, null, null, null, null);
 
         Pet pet = new Pet(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1), cursor.getString(3));
+                cursor.getString(2), cursor.getString(3));
 
         return pet;
     }
@@ -82,8 +85,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 Pet pet = new Pet();
                 pet.setId(Integer.parseInt(cursor.getString(0)));
-                pet.setName(cursor.getString(1));
-                pet.setRfidId(cursor.getString(2));
+                pet.setName(cursor.getString(2));
+                pet.setRfidId(cursor.getString(3));
 
                 pets.add(pet);
             } while (cursor.moveToNext());

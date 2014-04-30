@@ -151,6 +151,8 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                     .show();
             finish();
             return;
+        } else {
+          scanLeDevice(true);
         }
 
         //Intent mBLEIntent = new Intent(this, RBLService.class);
@@ -296,22 +298,20 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     }
 
     private void scanLeDevice(final boolean enable) {
-        if (enable) {
-            // Stops scanning after a pre-defined scan period.
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBLEAdapter.stopLeScan(mLeScanCallback);
-                }
-            }, SCAN_PERIOD);
+        new Thread() {
+            @Override
+            public void run() {
+                mBLEAdapter.startLeScan(mLeScanCallback);
 
-            mScanning = true;
-            mBLEAdapter.startLeScan(mLeScanCallback);
-        } else {
-            mScanning = false;
-            mBLEAdapter.stopLeScan(mLeScanCallback);
-        }
+                try {
+                    Thread.sleep(SCAN_PERIOD);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                mBLEAdapter.stopLeScan(mLeScanCallback);
+            }
+        }.start();
     }
 
 
@@ -340,9 +340,13 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 @Override
                 public void run()
                 {
-                    if(device != null && (device.getAddress().equals("F7:11:FE:5A:54:60") || device.getName().contains("Shield")))
-                    {
-                       mDevice = device;
+
+                    if(device != null) {
+                        String devName = device.getName();
+                        if(device.getAddress().equals("F7:11:FE:5A:54:60") || (devName != null && devName.contains("Shield")))
+                        {
+                           mDevice = device;
+                        }
                     }
                 }
             });

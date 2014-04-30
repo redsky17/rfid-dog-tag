@@ -51,7 +51,7 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         List<Pet> pets = helper.getAllPets();
 
         for (Pet pet : pets) {
-            items.add(new RfidViewListItem(pet.getName()));
+            items.add(new RfidViewListItem(pet.getName(), pet.getRfidId()));
         }
 
         //items.add(new RfidViewListItem(inflater,"Sparky"));
