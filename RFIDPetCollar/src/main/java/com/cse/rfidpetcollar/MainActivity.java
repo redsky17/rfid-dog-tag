@@ -314,22 +314,6 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }.start();
     }
 
-
-    private void postScan()
-    {
-        if(deviceList.size() > 0)
-        {
-            for(BluetoothDevice device : deviceList)
-            {
-                if(device.getAddress().equals("F7:11:FE:5A:54:60"))
-                {
-                    //mBLEservice.connect(device.getAddress());
-                }
-
-            }
-        }
-    }
-
     private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
 
         @Override
@@ -440,6 +424,4 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 true);
         mBLEservice.readCharacteristic(characteristicRx);
     }
-
-
 }

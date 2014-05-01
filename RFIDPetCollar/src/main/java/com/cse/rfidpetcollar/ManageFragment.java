@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -73,36 +75,8 @@ public class ManageFragment extends android.support.v4.app.Fragment {
         //items.add(new RfidViewListItem(inflater,"Sparky"));
         //items.add(new RfidViewListItem(inflater,"Mr. Whiskers"));
 
-
         adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);
-
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //RfidViewListAdapter adapter = (RfidViewListAdapter) mListView.getAdapter();
-
-                //HashMap<String,Object> hm = (HashMap) adapter.getItem(position);
-
-                /** The clicked Item in the ListView */
-                RelativeLayout rLayout = (RelativeLayout) view;
-
-                /** Getting the toggle button corresponding to the clicked item */
-                Switch tgl = (Switch) rLayout.findViewById(R.id.toggle_button);
-
-                String petName = ((TextView)rLayout.findViewById(R.id.list_content)).getText().toString();
-
-                String rfidId = null;
-
-                DatabaseHelper dbHelper = new DatabaseHelper(getActivity());
-
-                if(tgl.isChecked()){
-                    tgl.setChecked(false);
-                }else{
-                    tgl.setChecked(true);
-                }
-            }
-        });
 
         setHasOptionsMenu(true);
 
@@ -183,6 +157,12 @@ public class ManageFragment extends android.support.v4.app.Fragment {
     public void onStop()
     {
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
     }
 
     public static final class RfidListItemActionMode implements ActionMode.Callback {

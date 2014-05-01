@@ -72,6 +72,7 @@ public class RfidViewListItem implements RfidViewItem {
                         Intent intent = new Intent(ctx, TogglePermissionActivity.class);
                         intent.putExtra("RFID_TAG", rfidId);
                         intent.putExtra("IS_ALLOWED", toggle.isChecked());
+                        intent.putExtra("BLE_DEVICE", MainActivity.mDevice);
                         ctx.startActivity(intent);
                     }
                 }

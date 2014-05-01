@@ -275,6 +275,8 @@ public class PairFragment extends android.support.v4.app.Fragment {
             mBLEservice.disconnect();
             mBLEservice.close();
         }
+
+        //getActivity().unbindService(mServiceConnection);
     }
 
     private void getGattService(BluetoothGattService gattService) {

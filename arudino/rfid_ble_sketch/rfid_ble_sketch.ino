@@ -21,7 +21,7 @@
 //unsigned char INVENTORY[] = { 0x43, 0x04, 0x01, 0xcd}; // get rssi inventory
 int incoming=0;       //incoming from user
 int bytesread = 0; 
-char tag[TAG_LEN];    // the tag that is read by the RFID reader
+
 char pairedTags[MAX_TAGS][TAG_LEN]; // for simplicity's sake, I'm making this a fixed size array for up to 10 approved tags
 boolean isTagApproved[MAX_TAGS]; // this is a parallel array for pairedTags for checking the permissions of the tag
 
@@ -33,14 +33,14 @@ int numTags = 0;
 
 #define DOOR_PIN 4
 
-#define DOOR_LOCK_TIMEOUT 10000 // 10 seconds to re-lock the door
+#define DOOR_LOCK_TIMEOUT 2500 // 2.5 seconds to re-lock the door
 
 SoftwareSerial rfid(RX_Pin, TX_Pin);
  
 void setup()
 {
   rfid.begin(2400); // reader MUST be at 2400 baud
-  Serial.begin(9600);
+  Serial.begin(57600);
   pinMode(Enable, OUTPUT);
   digitalWrite(Enable, LOW); // enable reader
   pinMode(DOOR_PIN, OUTPUT); // enable door lock
@@ -82,9 +82,10 @@ void ble_write_string(char *bytes, uint8_t len)
   }  
 }
 
-
 void loop()
 {
+  char tag[TAG_LEN];    // the tag that is read by the RFID reader
+  
   // rfid stuff
   if(rfid.available() > 0) {          // if data available from reader 
     if((incoming = rfid.read()) == 10) {   // check for header 
@@ -106,15 +107,24 @@ void loop()
       }
      
       int index = -1;
-      if ((index = find_index(pairedTags, numTags, tag)) != -1) // we found the tag
+      index = find_index(pairedTags, numTags, tag);
+      Serial.print("Tag index: ");
+      Serial.println(index);
+      if (index != -1) // we found the tag
       {
          if (isTagApproved[index])
          {
            // TODO: unlock the door!
            // Do something with millis to make it lock again after like 5 seconds
+           Serial.println("Door unlocked");
            digitalWrite(DOOR_PIN, LOW);
            unlockTime = millis();
            isDoorOpen = true;
+         }
+         else {
+           Serial.println("Door locked");
+           digitalWrite(DOOR_PIN, HIGH);
+           isDoorOpen = false;
          }
       }
       
@@ -123,17 +133,20 @@ void loop()
       delay(1500);                            // wait for a bit 
       digitalWrite(Enable, LOW);                   // Activate the RFID reader
       
-      if (isDoorOpen && millis() - unlockTime > DOOR_LOCK_TIMEOUT)  //  && TODO something with millis
-      {
-         // TODO: send lock signal to door lock
-         digitalWrite(DOOR_PIN, HIGH);
-         isDoorOpen = false;
-      }
+
     } 
   } 
   
+  if (isDoorOpen && millis() - unlockTime > DOOR_LOCK_TIMEOUT)  //  && TODO something with millis
+  {
+     // TODO: send lock signal to door lock
+     Serial.println("Door locked");
+     digitalWrite(DOOR_PIN, HIGH);
+     isDoorOpen = false;
+  }
+  
   // bluetooth stuff
-  while (ble_available())
+  while (ble_available() > 0)
   {
       byte cmd;
       cmd = ble_read();
@@ -144,15 +157,18 @@ void loop()
         readingTag = false;
       }
       
-      Serial.println("BLE Received: " + cmd);
+      //Serial.print("BLE Received: ");
+      //Serial.println(cmd);
       
       switch(cmd)
       {
         case 'R':   // query tag
+            Serial.println("Query Tag Command Received");
             readingTag = true;
             memcpy(pairingTag, tag, sizeof(pairingTag));
             break;
         case 'P':  // accept and pair the tag
+            Serial.println("Tag Paired");
             if (find_index(pairedTags, numTags, pairingTag) == -1 && numTags < 10) // we didn't find the tag, add it
             {
                 for (int i = 0; i < TAG_LEN; i++)
@@ -185,31 +201,44 @@ void loop()
              }
             
              int index = -1;
+             Serial.print("Received toggle command: ");
+             Serial.print(tagRead);
+             index = find_index(pairedTags, numTags, tagRead);
              // find it's index
-             if ((index = find_index(pairedTags, numTags, tagRead)) != -1) // we found the tag
+             Serial.print("Tag Index: ");
+             Serial.println(index);
+             if (index != -1) // we found the tag
              { 
+                byte allowed = ble_read();
+                Serial.print("Tag allowed: ");
+                Serial.println(allowed);
                 // if it exists, set the corresponding isTagApproved value to whatever the value sent over BT is
-                isTagApproved[index] = ble_read() > 0 ? true : false;
+                isTagApproved[index] = allowed > 0 ? true : false;
              }             
              else  // add it since the app trusts it
              {
-                for (int i = 0; i < TAG_LEN; i++)
-                {
-                  pairedTags[numTags][i] = tagRead[i];
-                }
-                isTagApproved[numTags] = ble_read() > 0 ? true : false;
-                
-                numTags++;
+               Serial.println("Adding tag since it's not in our records.");
+               byte allowed = ble_read();
+               Serial.print("Tag allowed: ");
+               Serial.println(allowed);
+
+               for (int i = 0; i < TAG_LEN; i++)
+               {
+                 pairedTags[numTags][i] = tagRead[i];
+               }
+               isTagApproved[numTags] = allowed > 0 ? true : false;
+               
+               numTags++;
              } 
              
-                             // flash the rfid to show confirmation
-                digitalWrite(Enable, HIGH);
-                delay(250);
-                digitalWrite(Enable, LOW);
-                delay(250);
-                digitalWrite(Enable, HIGH);
-                delay(250);
-                digitalWrite(Enable, LOW);
+             // flash the rfid to show confirmation
+             digitalWrite(Enable, HIGH);
+             delay(250);
+             digitalWrite(Enable, LOW);
+             delay(250);
+             digitalWrite(Enable, HIGH);
+             delay(250);
+             digitalWrite(Enable, LOW);
              
              break;
             
