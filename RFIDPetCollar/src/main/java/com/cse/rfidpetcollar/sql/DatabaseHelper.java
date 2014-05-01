@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_CATEGORY = "category";
     private static final String KEY_PETNAME = "pet_name";
     private static final String KEY_PETID = "pet_id";
+    private static final String KEY_ALLOWED = "allowed";
 
     public DatabaseHelper(Context context) {
         super (context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_RFID + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_CATEGORY + " TEXT,"
-                + KEY_PETNAME + " TEXT," + KEY_PETID + " TEXT" + ")";
+                + KEY_PETNAME + " TEXT," + KEY_PETID + " TEXT," + KEY_ALLOWED + " INTEGER" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
 
@@ -50,9 +51,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_PETNAME, pet.getName());
-        values.put(KEY_PETID, pet.getRfidId());
-
+        String petName = pet.getName();
+        String petRfidId = pet.getRfidId();
+        values.put(KEY_CATEGORY, "");
+        values.put(KEY_PETNAME, petName);
+        values.put(KEY_PETID, petRfidId);
+        values.put(KEY_ALLOWED, pet.getAllowed());
         db.insert(TABLE_RFID, null, values);
         db.close();
     }
@@ -65,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[] {String.valueOf(id)}, null, null, null, null);
 
         Pet pet = new Pet(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1), cursor.getString(3));
+                cursor.getString(2), cursor.getString(3));
 
         return pet;
     }
@@ -82,8 +86,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 Pet pet = new Pet();
                 pet.setId(Integer.parseInt(cursor.getString(0)));
-                pet.setName(cursor.getString(1));
-                pet.setRfidId(cursor.getString(2));
+                pet.setName(cursor.getString(2));
+                pet.setRfidId(cursor.getString(3));
+                pet.setAllowed((cursor.getInt(4) == 1)? true : false);
 
                 pets.add(pet);
             } while (cursor.moveToNext());
@@ -108,7 +113,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_PETNAME, pet.getName());
         values.put(KEY_PETID, pet.getRfidId());
-
+        values.put(KEY_ALLOWED, pet.getAllowed());
         // updating row
         return db.update(TABLE_RFID, values, KEY_ID + " = ?",
                 new String[] { String.valueOf(pet.getId()) });

@@ -19,11 +19,9 @@ import java.util.Date;
  */
 public class RfidViewListAccess implements RfidViewItem {
     private Date date;
-    private final LayoutInflater inflater;
 
-    public RfidViewListAccess(LayoutInflater inflater, Date date1) {
+    public RfidViewListAccess( Date date1) {
         this.date = date1;
-        this.inflater = inflater;
     }
 
     @Override

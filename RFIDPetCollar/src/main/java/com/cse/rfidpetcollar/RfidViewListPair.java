@@ -16,11 +16,9 @@ import java.util.Date;
  */
 public class RfidViewListPair implements RfidViewItem {
     private String tag;
-    private final LayoutInflater inflater;
 
-    public RfidViewListPair(LayoutInflater inflater, String tagId) {
+    public RfidViewListPair(String tagId) {
         this.tag = tagId;
-        this.inflater = inflater;
     }
 
     @Override

@@ -7,13 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-<<<<<<< HEAD
-            <option value="C:\Users\David\Documents\GitHub\rfid-dog-tag" />
-            <option value="C:\Users\David\Documents\GitHub\rfid-dog-tag\RFIDPetCollar" />
-=======
-            <option value="C:\Users\Joseph\Documents\android-projects\rfid-dog-tag" />
-            <option value="C:\Users\Joseph\Documents\android-projects\rfid-dog-tag\RFIDPetCollar" />
->>>>>>> 0b6fbd860fe7e1e601ca50699bd62a648529f20e
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/RFIDPetCollar" />
           </set>
         </option>
       </GradleProjectSettings>

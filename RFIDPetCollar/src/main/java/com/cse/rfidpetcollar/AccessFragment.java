@@ -33,12 +33,12 @@ public class AccessFragment extends android.support.v4.app.Fragment {
         Date testDateA = new Date(114, 4, 22, 19, 30, 45);
         Date testDateB = new Date(114, 4, 20, 7, 25, 15);
 
-        items.add(new RfidViewListHeader(inflater, "Sparky"));
-        items.add(new RfidViewListAccess(inflater, testDateA));
-        items.add(new RfidViewListAccess(inflater, testDateB));
-        items.add(new RfidViewListHeader(inflater, "Mr. Whiskers"));
-        items.add(new RfidViewListAccess(inflater, testDateA));
-        items.add(new RfidViewListAccess(inflater, testDateB));
+        items.add(new RfidViewListHeader("Sparky"));
+        items.add(new RfidViewListAccess(testDateA));
+        items.add(new RfidViewListAccess(testDateB));
+        items.add(new RfidViewListHeader("Mr. Whiskers"));
+        items.add(new RfidViewListAccess(testDateA));
+        items.add(new RfidViewListAccess(testDateB));
 
         RfidViewListAdapter adapter = new RfidViewListAdapter(this.getActivity(), items);
         mListView.setAdapter(adapter);

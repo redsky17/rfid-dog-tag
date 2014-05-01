@@ -46,10 +46,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends android.support.v7.app.ActionBarActivity {
+    public static final String EXTRAS_DEVICE = "EXTRAS_DEVICE";
+
     private NavDrawerListAdapter adapter;                   // adapter for menu items
     private String[] mNavTitles;                            // each menu item
     private TypedArray mNavIcons;                           // icon for each menu item
     private ArrayList<NavDrawerItem> navDrawerItems;        // each menu item with icon
+
+
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -61,9 +65,15 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     // Bluetooth needed members
     private RBLService mBLEservice;
     private BluetoothAdapter mBLEAdapter;
+    public static BluetoothDevice mDevice;
     private ArrayList<BluetoothDevice> deviceList;
+    private boolean mScanning;
+    private Handler mHandler = new Handler();
+    private boolean alertDisplayed = false;
+
 
     private final long SCAN_PERIOD = 15000;
+    private static final int REQUEST_ENABLE_BT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +109,9 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 R.string.drawer_close  /* "close drawer" description */
         ) {
 
-            /** Called when a drawer has settled in a completely closed state. */
+            /**
+             * Called when a drawer has settled in a completely closed state.
+             */
             public void onDrawerClosed(View view) {
                 // TODO: Make this set the title to the selected view's title.
                 super.onDrawerClosed(view);
@@ -107,12 +119,14 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 invalidateOptionsMenu();
             }
 
-            /** Called when a drawer has settled in a completely open state. */
+            /**
+             * Called when a drawer has settled in a completely open state.
+             */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 getSupportActionBar().setTitle(getString(R.string.app_name));
                 //getSupportActionBar().removeAllTabs();
-               // getSupportActionBar().
+                // getSupportActionBar().
                 invalidateOptionsMenu();
             }
         };
@@ -128,29 +142,22 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
 
-
         final BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBLEAdapter = mBluetoothManager.getAdapter();
 
-        if(!mBLEAdapter.isEnabled()) {
-            Log.e(TAG, "Bluetooth not enabled");
-            new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("Bluetooth not enabled!")
-                    .setMessage("Go to settings and turn it on?")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // TODO: take user to settings
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
 
-                        }
-                    }).show();
+        if (mBLEAdapter == null) {
+            Toast.makeText(this, "BLE not supported.  BLE is required for this app to work.", Toast.LENGTH_SHORT)
+                    .show();
+            finish();
+            return;
+        } else {
+          scanLeDevice(true);
         }
 
-        Intent mBLEIntent = new Intent(this, RBLService.class);
-        bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
+        //Intent mBLEIntent = new Intent(this, RBLService.class);
+        //bindService(mBLEIntent, mServiceConnection, BIND_AUTO_CREATE);
+
     }
 
     @Override
@@ -158,6 +165,24 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
     {
         // make sure bluetooth still enable, sync with app
         super.onResume();
+        if (!mBLEAdapter.isEnabled()) {
+        Log.e(TAG, "Bluetooth not enabled");
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Bluetooth not enabled!")
+                .setMessage("Turn it on?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (mBLEAdapter.getState() == BluetoothAdapter.STATE_OFF) {
+                            mBLEAdapter.enable();                                           // force BT on
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -204,8 +229,6 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
 
         return super.onPrepareOptionsMenu(menu);
     }
-
-
     /**
      * Diplays fragment view for selected nav drawer list item
      */
@@ -229,6 +252,10 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }
 
         if (fragment != null) {
+            //Bundle bundle = new Bundle();
+            //bundle.putParcelable(MainActivity.EXTRAS_DEVICE, mDevice);
+            //fragment.setArguments(bundle);
+
             android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.container, fragment);
             transaction.addToBackStack(null);
@@ -270,26 +297,21 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
         }
     }
 
-    private boolean mScanning;
-    private Handler mHandler = new Handler();
-
     private void scanLeDevice(final boolean enable) {
-        if (enable) {
-            // Stops scanning after a pre-defined scan period.
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBLEAdapter.stopLeScan(mLeScanCallback);
-                }
-            }, SCAN_PERIOD);
+        new Thread() {
+            @Override
+            public void run() {
+                mBLEAdapter.startLeScan(mLeScanCallback);
 
-            mScanning = true;
-            mBLEAdapter.startLeScan(mLeScanCallback);
-        } else {
-            mScanning = false;
-            mBLEAdapter.stopLeScan(mLeScanCallback);
-        }
+                try {
+                    Thread.sleep(SCAN_PERIOD);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                mBLEAdapter.stopLeScan(mLeScanCallback);
+            }
+        }.start();
     }
 
 
@@ -318,16 +340,20 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                 @Override
                 public void run()
                 {
-                    if(device.getAddress().equals("F7:11:FE:5A:54:60"))
-                    {
-                       mBLEservice.connect(device.getAddress());
+
+                    if(device != null) {
+                        String devName = device.getName();
+                        if(device.getAddress().equals("F7:11:FE:5A:54:60") || (devName != null && devName.contains("Shield")))
+                        {
+                           mDevice = device;
+                        }
                     }
                 }
             });
         }
     };
 
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+    public final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName,
@@ -354,7 +380,15 @@ public class MainActivity extends android.support.v7.app.ActionBarActivity {
                         .setMessage("Go to settings and turn it on?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // take user to settings
+                                if (mBLEAdapter != null) {
+                                    if (mBLEAdapter.getState() == BluetoothAdapter.STATE_ON) {
+                                        mBLEAdapter.disable();
+                                    } else if (mBLEAdapter.getState() == BluetoothAdapter.STATE_OFF) {
+                                        mBLEAdapter.enable();
+                                    } else {
+                                        //State.INTERMEDIATE_STATE;
+                                    }
+                                }
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

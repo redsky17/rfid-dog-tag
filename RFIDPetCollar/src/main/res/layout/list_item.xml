@@ -6,16 +6,16 @@
     android:minHeight="?android:attr/listPreferredItemHeightLarge"
     android:padding="8dp">
 
-    <ToggleButton
+    <Switch
         android:id="@+id/toggle_button"
-        android:layout_width="80dip"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:textOn="Allow"
-        android:textOff="Disallow"/>
+        android:layout_centerInParent="true"/>
+        <!--android:textOn="Allow"
+        android:textOff="Disallow"-->
 
     <ImageButton
         android:id="@+id/delete_button"
